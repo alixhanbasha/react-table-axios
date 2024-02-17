@@ -1,3 +1,14 @@
+TODO
+    - pagination
+    - sortimi
+    - filter/search
+    - error states
+    - loading states
+    - display the list of posts in UserView
+    - display user info in UserView
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

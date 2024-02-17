@@ -12,18 +12,13 @@ const App: React.FC = () => {
   return (
     <div>
       <nav className="navbar navbar-expand navbar-dark bg-dark">
-        <a href="/tutorials" className="navbar-brand">
+        <a href="/users" className="navbar-brand">
           Hello World!
         </a>
         <div className="navbar-nav mr-auto">
           <li className="nav-item">
             <Link to={"/users"} className="nav-link">
               List of Users
-            </Link>
-          </li>
-          <li className="nav-item">
-            <Link to={"/users/:id"} className="nav-link">
-              User Profile
             </Link>
           </li>
         </div>
@@ -33,7 +28,7 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={<UserList/>} />
           <Route path="/users" element={<UserList/>} />
-          <Route path="/users/:id" element={<UserView/>} />
+          <Route path="/user/:id" element={<UserView/>} />
         </Routes>
       </div>
     </div>

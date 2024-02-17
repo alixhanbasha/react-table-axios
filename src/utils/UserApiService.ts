@@ -19,12 +19,8 @@ const filterUser = (key: string, value: string) => {
 };
 
 // for pagination
-const get25Users = (skip?: number) => {
-    let skipAhead = typeof skip !== 'undefined'
-        ? skip
-        : 0;
-
-    return http.get<Array<IUserData>>(`/users?limit=25&skip=${skipAhead}`);
+const get25Users = (page: number) => {
+    return http.get<Array<IUserData>>(`/users?limit=25&skip=${page}`);
 }
 
 const UserApiService = {

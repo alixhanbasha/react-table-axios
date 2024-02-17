@@ -4,10 +4,9 @@ import UserApiService from "../utils/UserApiService";
 import IUserData from '../types/IUserData';
 import Table from "./Table";
 
-const UserList: FC = (props: any) => {
+
+const UserList: FC = () => {
     const [users, setUsers] = useState<Array<IUserData>>([]);
-    const [currentUser, setCurrentUser] = useState<IUserData | null>(null);
-    const [currentIndex, setCurrentIndex] = useState<number>(-1);
     const [searchName, setSearchName] = useState<string>("");
     const [filter, setFilter] = useState<string>("");
     const [filterValue, setFilterValue] = useState<string>("");
@@ -31,16 +30,10 @@ const UserList: FC = (props: any) => {
         setFilterValue(value);
     };
 
-    const onPaginationClick = (index: number, e: ChangeEvent<HTMLInputElement>) => {
-        let pagination = index === 1 ? 0
-            : index === 2 ? 25
-                : index === 3 ? 50
-                    : 75;
-
-        UserApiService.get25Users(pagination)
+    const getData = async (page: number) => {
+        await UserApiService.get25Users(page)
             .then((response: any) => {
-                setUsers(response.data); // TODO
-                console.log(response.data);
+                setUsers(response.data.users);
             })
             .catch((e: Error) => {
                 console.log(e);
@@ -48,51 +41,29 @@ const UserList: FC = (props: any) => {
     }
 
     const retrieveUsers = async () => {
-        await UserApiService.get25Users()
+        await UserApiService.get25Users(0)
             .then((response: any) => {
-                setUsers(response.data);
-                console.log(response.data);
+                setUsers(response.data.users);
             })
             .catch((e: Error) => {
                 console.log(e);
             });
     };
 
-    const refreshList = () => {
-        retrieveUsers();
-        setCurrentUser(null);
-        setCurrentIndex(-1);
-    };
-
-    const setActiveUser = (tutorial: IUserData, index: number) => {
-        setCurrentUser(tutorial);
-        setCurrentIndex(index);
-    };
-
-    const openUserProfile = (userid: string) => {
-        console.log("Should open user profile.")
-    }
-
-    const findByName = () => {
-        UserApiService.findByName(searchName)
+    const findByName = async () => {
+        await UserApiService.findByName(searchName)
             .then((response: any) => {
-                setUsers(response.data);
-                setCurrentUser(null);
-                setCurrentIndex(-1);
-                console.log(response.data);
+                setUsers(response.data.users);
             })
             .catch((e: Error) => {
                 console.log(e);
             });
     };
 
-    const findWithFilter = () => {
-        UserApiService.filterUser(filter, filterValue)
+    const findWithFilter = async () => {
+        await UserApiService.filterUser(filter, filterValue)
             .then((response: any) => {
-                setUsers(response.data);
-                setCurrentUser(null);
-                setCurrentIndex(-1);
-                console.log(response.data);
+                setUsers(response.data.users);
             })
             .catch((e: Error) => {
                 console.log(e);
@@ -100,15 +71,15 @@ const UserList: FC = (props: any) => {
     }
 
     const columns = [
-        {
-          Header: "Title",
-          accessor: "title",
-        },
-        {
-          Header: "Description",
-          accessor: "description",
-        },
-      ];
+        { Header: 'ID', accessor: 'id' },
+        { Header: 'Name', accessor: 'firstName' },
+        { Header: 'Last Name', accessor: 'lastName' },
+        { Header: 'Email', accessor: 'email' },
+        { Header: 'Address', accessor: 'address.address' },
+        { Header: 'City', accessor: 'address.city' },
+        { Header: 'State', accessor: 'address.state' },
+        // Add more columns as needed
+    ];
 
     return (
         <div className="list row">
@@ -164,10 +135,42 @@ const UserList: FC = (props: any) => {
                     </div>
                 </div>
             </div>
-            
 
-            <Table columns={columns} data={users}></Table>
+            {users.length > 0 && <Table columns={columns} data={users} /> || <>Could not find anything</>}
 
+            <div className="d-flex gap-2 justify-content-end">
+                <button
+                    className="btn btn-outline-secondary"
+                    type="button"
+                    onClick={() => getData(0)}
+                >
+                    1
+                </button>
+
+                <button
+                    className="btn btn-outline-secondary"
+                    type="button"
+                    onClick={() => getData(25)}
+                >
+                    2
+                </button>
+
+                <button
+                    className="btn btn-outline-secondary"
+                    type="button"
+                    onClick={() => getData(50)}
+                >
+                    3
+                </button>
+
+                <button
+                    className="btn btn-outline-secondary"
+                    type="button"
+                    onClick={() => getData(75)}
+                >
+                    4
+                </button>
+            </div>
 
         </div>
     );
