@@ -50,7 +50,7 @@ const UserList: FC = (props: any) => {
     const retrieveUsers = async () => {
         await UserApiService.get25Users()
             .then((response: any) => {
-                setUsers(response.data);
+                setUsers(response.data.users);
                 console.log(response.data);
             })
             .catch((e: Error) => {
@@ -99,17 +99,15 @@ const UserList: FC = (props: any) => {
             });
     }
 
+    // Usage example:
     const columns = [
-        {
-          Header: "Title",
-          accessor: "title",
-        },
-        {
-          Header: "Description",
-          accessor: "description",
-        },
-      ];
-
+    { Header: 'Name', accessor: 'firstName' }, // Non-nested property
+    { Header: 'Address', accessor: 'address.address' },
+    { Header: 'City', accessor: 'address.city' },
+    { Header: 'State', accessor: 'address.state' },
+    // Add more columns as needed
+  ];
+      
     return (
         <div className="list row">
             <div className="col-md-8">
@@ -166,7 +164,7 @@ const UserList: FC = (props: any) => {
             </div>
             
 
-            <Table columns={columns} data={users}></Table>
+            {users.length > 0 && <Table columns={columns} data={users} />}
 
 
         </div>
