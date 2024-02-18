@@ -3,6 +3,7 @@ import React, { useState, useEffect, ChangeEvent, FC, useMemo } from "react";
 import UserApiService from "../utils/UserApiService";
 import IUserData from '../types/IUserData';
 import Table from "./Table";
+import Pagination from "./Pagination";
 
 
 const UserList: FC = () => {
@@ -10,6 +11,10 @@ const UserList: FC = () => {
     const [searchName, setSearchName] = useState<string>("");
     const [filter, setFilter] = useState<string>("");
     const [filterValue, setFilterValue] = useState<string>("");
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [total, setTotal] = useState<number>(0);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string>("");
 
     useEffect(() => {
         retrieveUsers();
@@ -31,7 +36,7 @@ const UserList: FC = () => {
     };
 
     const getData = async (page: number) => {
-        await UserApiService.get25Users(page)
+        await UserApiService.getUsersPerPage(page, 25)
             .then((response: any) => {
                 setUsers(response.data.users);
             })
@@ -41,24 +46,39 @@ const UserList: FC = () => {
     }
 
     const retrieveUsers = async () => {
-        await UserApiService.get25Users(0)
+        setLoading(true)
+        await UserApiService.getUsersPerPage(100, 0)
             .then((response: any) => {
+                console.log({ resp: response.data });
                 setUsers(response.data.users);
+                setTotal(response.data.total);
+                // set error empty
             })
             .catch((e: Error) => {
+                // set error message
                 console.log(e);
-            });
+            }).finally(() => {
+                setLoading(false);
+            }
+            )
     };
 
-    const findByName = async () => {
-        await UserApiService.findByName(searchName)
-            .then((response: any) => {
-                setUsers(response.data.users);
-            })
-            .catch((e: Error) => {
-                console.log(e);
-            });
-    };
+    // const findByName = async () => {
+    //     setSearching(true);
+    //     await UserApiService.findByName(searchName)
+    //         .then((response: any) => {
+    //             setUsers(response.data.users);
+    //             setTotal(response.data.total);
+    //         })
+    //         .catch((e: Error) => {
+    //             console.log(e);
+    //         }).finally(() => {  
+    //             if(searchName.length < 1){
+    //                 setSearching(false);
+    //                 getData(currentPage);
+    //             }
+    //         });
+    // };
 
     const findWithFilter = async () => {
         await UserApiService.filterUser(filter, filterValue)
@@ -71,19 +91,31 @@ const UserList: FC = () => {
     }
 
     const columns = [
-        { Header: 'ID', accessor: 'id' },
-        { Header: 'Name', accessor: 'firstName' },
-        { Header: 'Last Name', accessor: 'lastName' },
-        { Header: 'Email', accessor: 'email' },
-        { Header: 'Address', accessor: 'address.address' },
-        { Header: 'City', accessor: 'address.city' },
-        { Header: 'State', accessor: 'address.state' },
+        { title: 'ID', prop: 'id' ,isSortable: true,
+      isFilterable: true},
+        { title: 'Name', prop: 'firstName' ,isSortable: true,
+      isFilterable: true},
+        { title: 'Last Name', prop: 'lastName' ,isSortable: true,
+      isFilterable: true},
+        { title: 'Email', prop: 'email' ,isSortable: true,
+      isFilterable: true},
+        { title: 'Address', prop: 'address.address' ,
+      isFilterable: true},
+        { title: 'City', prop: 'address.city' ,isSortable: true,
+      isFilterable: true},
+        { title: 'State', prop: 'address.state' ,isSortable: true,
+      isFilterable: true},
         // Add more columns as needed
     ];
 
+    const handlePagination = (pageNumber: number) => {
+        getData(pageNumber)
+        setCurrentPage(pageNumber);
+    };
+
     return (
         <div className="list row">
-            <div className="col-md-8">
+            {/* <div className="col-md-8">
                 <div className="input-group mb-3">
                     <input
                         type="text"
@@ -134,43 +166,20 @@ const UserList: FC = () => {
                         </button>
                     </div>
                 </div>
-            </div>
+            </div> */}
 
-            {users.length > 0 && <Table columns={columns} data={users} /> || <>Could not find anything</>}
+{ loading ? <div className="spinner-border" role="status">
+  <span className="visually-hidden">Loading...</span>
+</div>
+:
+             <Table columns={columns} data={users} />}
+       {/* {!searching &&   <Pagination
+                length={total}
+                postsPerPage={users.length}
+                handlePress={handlePagination}
+                currentPage={currentPage}
+            />} */}
 
-            <div className="d-flex gap-2 justify-content-end">
-                <button
-                    className="btn btn-outline-secondary"
-                    type="button"
-                    onClick={() => getData(0)}
-                >
-                    1
-                </button>
-
-                <button
-                    className="btn btn-outline-secondary"
-                    type="button"
-                    onClick={() => getData(25)}
-                >
-                    2
-                </button>
-
-                <button
-                    className="btn btn-outline-secondary"
-                    type="button"
-                    onClick={() => getData(50)}
-                >
-                    3
-                </button>
-
-                <button
-                    className="btn btn-outline-secondary"
-                    type="button"
-                    onClick={() => getData(75)}
-                >
-                    4
-                </button>
-            </div>
 
         </div>
     );

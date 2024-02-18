@@ -19,15 +19,15 @@ const filterUser = (key: string, value: string) => {
 };
 
 // for pagination
-const get25Users = (page: number) => {
-    return http.get<Array<IUserData>>(`/users?limit=25&skip=${page}`);
+const getUsersPerPage = (page: number, limit: number) => {
+    return http.get<Array<IUserData>>(`/users?limit=${limit}&skip=${(page - 1) * limit}`);
 }
 
 const UserApiService = {
     getAll,
     get,
     findByName,
-    get25Users,
+    getUsersPerPage,
     filterUser
 };
 

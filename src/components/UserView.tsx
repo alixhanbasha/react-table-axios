@@ -42,12 +42,21 @@ const UserView: FC = () => {
             });
     }
 
-    return <>
-        <p> hello {currentUser?.firstName}</p>
-        { posts?.forEach( e => {
-            <p>{e.title}</p>
+    return <div>
+        <p>{currentUser?.firstName + " " + currentUser?.lastName}</p>
+        { posts?.map( e => {
+            // design postet
+            return (<div>
+                <p>{e.title}</p>
+                <p>{e.body}</p>
+                <div className="row">
+                {e.tags.map( tag => {
+                    return <div className='col-4'>{tag + " "}</div>
+                })}
+                 </div>
+                </div>)
         } ) }
-    </>
+    </div>
 }
 
 export default UserView;
